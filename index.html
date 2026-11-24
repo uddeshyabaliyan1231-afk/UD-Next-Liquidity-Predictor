@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UD Next Liquidity Predictor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>UD NEXT LIQUIDITY PREDICTOR</h1>
+      <p>Delta Exchange India · BSL vs SSL Intelligence</p>
+    </div>
+    <span id="connectionStatus">DISCONNECTED</span>
+  </header>
+
+  <main>
+    <section class="controls">
+      <input id="coinSearch" type="text" placeholder="Search coin, e.g. BTCUSD">
+      <button id="searchBtn">ANALYZE COIN</button>
+      <button id="startBtn">START SCANNER</button>
+      <button id="stopBtn">STOP</button>
+    </section>
+
+    <section class="metrics">
+      <article class="metric">
+        <p>COINS SCANNED</p>
+        <h2 id="scannedCount">0</h2>
+      </article>
+      <article class="metric">
+        <p>BSL DOMINANCE</p>
+        <h2 id="bslCount">0</h2>
+      </article>
+      <article class="metric">
+        <p>SSL DOMINANCE</p>
+        <h2 id="sslCount">0</h2>
+      </article>
+      <article class="metric">
+        <p>LAST UPDATE</p>
+        <h2 id="lastUpdate">--:--</h2>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>LIQUIDITY ANALYSIS</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>COIN</th>
+              <th>PRICE</th>
+              <th>BSL PRICE</th>
+              <th>SSL PRICE</th>
+              <th>BSL DISTANCE</th>
+              <th>SSL DISTANCE</th>
+              <th>BSL SCORE</th>
+              <th>SSL SCORE</th>
+              <th>NEXT TARGET</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            <tr>
+              <td colspan="9">Scanner not started</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
