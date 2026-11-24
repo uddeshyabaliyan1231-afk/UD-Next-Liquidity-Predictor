@@ -2,121 +2,400 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UD CoinDCX Next Liquidity Predictor</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UD CoinDCX Next Liquidity Predictor</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:14px;background:#080d18;color:#e8edf7;font-family:Arial,sans-serif}
+header,.panel,.metric{background:#111b2d;border:1px solid #263752;border-radius:11px;padding:17px;margin-bottom:15px}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{font-size:19px;color:#55aaff;margin:0}
+header p{font-size:11px;color:#9aa9bf;margin:7px 0 0}
+#status{font-size:11px;color:#ff7777;font-weight:bold}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:15px}
+input,select{background:#0b1424;color:white;border:1px solid #30425f;padding:12px;border-radius:7px;min-width:130px}
+input{flex:1}
+button{background:#1677e8;color:white;border:0;padding:12px 16px;border-radius:7px;font-weight:bold;cursor:pointer}
+#stopBtn{background:#a83242}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px}
+.metric p{font-size:10px;color:#91a3bd;margin:0 0 10px}
+.metric h2{font-size:23px;color:#55aaff;margin:0}
+.panel h2{font-size:14px;color:#55aaff;margin:0 0 15px}
+.settings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.settings label{font-size:11px;color:#9aa9bf}
+.settings select{display:block;width:100%;margin-top:7px}
+.table-wrap{overflow-x:auto}
+table{width:100%;min-width:1050px;border-collapse:collapse;font-size:11px}
+th,td{padding:12px 9px;text-align:left;border-bottom:1px solid #263752;white-space:nowrap}
+th{color:#91a9cc;background:#17243a}
+.green{color:#37d996}.red{color:#ff7373}.blue{color:#55aaff}
+#details,#logs{font-size:12px;line-height:1.8;color:#bdcce0;overflow-wrap:anywhere}
+.small{font-size:10px;color:#8498b5}
+@media(max-width:650px){
+body{padding:9px}h1{font-size:15px}
+.metrics{grid-template-columns:repeat(2,1fr)}
+.settings{grid-template-columns:repeat(2,1fr)}
+.controls button{flex:1}
+}
+</style>
 </head>
 <body>
 
-<header class="topbar">
-  <div>
-    <h1>UD NEXT LIQUIDITY PREDICTOR</h1>
-    <p>COINDCX FUTURES | BSL vs SSL INTELLIGENCE</p>
-  </div>
-  <span id="connectionStatus">DISCONNECTED</span>
+<header>
+ <div>
+  <h1>UD NEXT LIQUIDITY PREDICTOR</h1>
+  <p>COINDCX FUTURES · BSL vs SSL INTELLIGENCE</p>
+ </div>
+ <span id="status">DISCONNECTED</span>
 </header>
 
-<main>
+<div class="controls">
+ <input id="search" placeholder="Search coin e.g. BTC">
+ <button id="searchBtn">ANALYZE</button>
+ <button id="startBtn">START SCANNER</button>
+ <button id="stopBtn">STOP</button>
+</div>
 
-  <section class="controls">
-    <input id="coinSearch" type="text" placeholder="Search coin / instrument">
-    <button id="searchBtn">ANALYZE COIN</button>
-    <button id="startBtn">START SCANNER</button>
-    <button id="stopBtn">STOP SCANNER</button>
-  </section>
+<section class="panel">
+ <h2>SCANNER SETTINGS</h2>
+ <div class="settings">
+  <label>Higher timeframe
+   <select id="htf"><option value="60">1 Hour</option></select>
+  </label>
+  <label>Entry timeframe
+   <select id="ltf"><option value="5">5 Minutes</option></select>
+  </label>
+  <label>Scan interval
+   <select id="interval">
+    <option value="30">30 Seconds</option>
+    <option value="60">60 Seconds</option>
+   </select>
+  </label>
+ </div>
+</section>
 
-  <section class="settings panel">
-    <h2>SCANNER SETTINGS</h2>
-    <div class="settings-grid">
-      <label>
-        Higher timeframe
-        <select id="higherTimeframe">
-          <option value="60">1 Hour</option>
-        </select>
-      </label>
-      <label>
-        Entry timeframe
-        <select id="entryTimeframe">
-          <option value="5">5 Minutes</option>
-        </select>
-      </label>
-      <label>
-        Market type
-        <select id="marketType">
-          <option value="futures">CoinDCX Futures</option>
-        </select>
-      </label>
-      <label>
-        Scan interval
-        <select id="scanInterval">
-          <option value="15">15 seconds</option>
-          <option value="30" selected>30 seconds</option>
-          <option value="60">60 seconds</option>
-        </select>
-      </label>
-    </div>
-  </section>
+<div class="metrics">
+ <div class="metric"><p>COINS SCANNED</p><h2 id="scanned">0</h2></div>
+ <div class="metric"><p>BSL DOMINANCE</p><h2 id="bslCount">0</h2></div>
+ <div class="metric"><p>SSL DOMINANCE</p><h2 id="sslCount">0</h2></div>
+ <div class="metric"><p>LAST UPDATE</p><h2 id="updated">--:--</h2></div>
+</div>
 
-  <section class="metrics">
-    <article class="metric">
-      <p>COINS SCANNED</p>
-      <h2 id="scannedCount">0</h2>
-    </article>
-    <article class="metric">
-      <p>BSL DOMINANCE</p>
-      <h2 id="bslCount">0</h2>
-    </article>
-    <article class="metric">
-      <p>SSL DOMINANCE</p>
-      <h2 id="sslCount">0</h2>
-    </article>
-    <article class="metric">
-      <p>LAST UPDATE</p>
-      <h2 id="lastUpdate">--:--</h2>
-    </article>
-  </section>
+<section class="panel">
+ <h2>LIVE LIQUIDITY RESULTS</h2>
+ <div class="table-wrap">
+ <table>
+ <thead>
+ <tr>
+ <th>COIN</th><th>PRICE</th><th>BSL PRICE</th>
+ <th>SSL PRICE</th><th>BSL DISTANCE</th>
+ <th>SSL DISTANCE</th><th>BSL SCORE</th>
+ <th>SSL SCORE</th><th>ORDER BOOK</th><th>NEXT TARGET</th>
+ </tr>
+ </thead>
+ <tbody id="results">
+ <tr><td colspan="10">Click START SCANNER</td></tr>
+ </tbody>
+ </table>
+ </div>
+</section>
 
-  <section class="panel">
-    <h2>COIN LIQUIDITY ANALYSIS</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>COIN</th>
-            <th>PRICE</th>
-            <th>BSL PRICE</th>
-            <th>SSL PRICE</th>
-            <th>BSL DISTANCE</th>
-            <th>SSL DISTANCE</th>
-            <th>BSL SCORE</th>
-            <th>SSL SCORE</th>
-            <th>NEXT TARGET</th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody">
-          <tr>
-            <td colspan="9">Click START SCANNER to begin</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+<section class="panel">
+ <h2>SELECTED COIN ANALYSIS</h2>
+ <div id="details">Search a coin or select a result.</div>
+</section>
 
-  <section class="panel">
-    <h2>SELECTED COIN DETAILS</h2>
-    <div id="coinDetails">
-      Search a coin to view its liquidity analysis.
-    </div>
-  </section>
+<section class="panel">
+ <h2>SCANNER LOG</h2>
+ <div id="logs">System ready.</div>
+</section>
 
-  <section class="panel">
-    <h2>SCANNER LOG</h2>
-    <div id="scannerLog">System ready. Waiting for scanner start...</div>
-  </section>
+<script>
+const API="https://api.coindcx.com";
+const PUBLIC="https://public.coindcx.com";
+let instruments=[];
+let results=[];
+let running=false;
+let timer=null;
+let busy=false;
 
-</main>
+const $=id=>document.getElementById(id);
 
-<script src="app.js"></script>
+function log(message){
+ $("logs").innerHTML=
+ new Date().toLocaleTimeString()+" · "+message+"<br>"+$("logs").innerHTML;
+}
+
+async function getJSON(url){
+ const response=await fetch(url);
+ if(!response.ok)throw new Error("HTTP "+response.status);
+ return response.json();
+}
+
+function number(v){return Number(v)||0}
+
+function pct(a,b){
+ if(!b)return 0;
+ return Math.abs((a-b)/b*100);
+}
+
+function normalizeCandles(data){
+ if(!Array.isArray(data))return [];
+ return data.map(c=>({
+  open:number(c.open),
+  high:number(c.high),
+  low:number(c.low),
+  close:number(c.close),
+  volume:number(c.volume),
+  time:number(c.time||c.open_time)
+ })).filter(c=>c.high&&c.low&&c.close)
+ .sort((a,b)=>a.time-b.time);
+}
+
+async function loadInstruments(){
+ const url=API+
+ "/exchange/v1/derivatives/futures/data/active_instruments?margin_currency_short_name[]=USDT";
+ const data=await getJSON(url);
+ if(!Array.isArray(data))throw new Error("Instrument list unavailable");
+ return data.map(x=>typeof x==="string"?x:x.pair)
+ .filter(Boolean);
+}
+
+async function getCandles(pair,resolution,count=100){
+ const now=Math.floor(Date.now()/1000);
+ const duration=resolution==="60"?3600:300;
+ const from=now-duration*count;
+ const url=PUBLIC+"/market_data/candlesticks?"+
+ "pair="+encodeURIComponent(pair)+
+ "&from="+from+"&to="+now+
+ "&resolution="+resolution+"&pcode=f";
+ const data=await getJSON(url);
+ return normalizeCandles(data);
+}
+
+async function getOrderbook(pair){
+ const url=PUBLIC+"/market_data/v3/orderbook/"+
+ encodeURIComponent(pair)+"-futures/50";
+ return getJSON(url);
+}
+
+function findLiquidity(candles,price,side){
+ const values=candles.slice(-60);
+ if(values.length<10)return {level:0,strength:0};
+ const field=side==="BSL"?"high":"low";
+ const levels=values.map(c=>c[field]);
+ const extreme=side==="BSL"?Math.max(...levels):Math.min(...levels);
+ const tolerance=price*0.0015;
+ const clusters=levels.filter(x=>Math.abs(x-extreme)<=tolerance);
+ return {
+  level:extreme,
+  strength:Math.min(100,clusters.length*20+20)
+ };
+}
+
+function orderbookPressure(book){
+ if(!book||!book.bids||!book.asks)return null;
+ const bids=Object.entries(book.bids).slice(0,20);
+ const asks=Object.entries(book.asks).slice(0,20);
+ const bidVol=bids.reduce((s,x)=>s+number(x[1]),0);
+ const askVol=asks.reduce((s,x)=>s+number(x[1]),0);
+ const total=bidVol+askVol;
+ if(!total)return null;
+ return {
+  bid:bidVol,
+  ask:askVol,
+  imbalance:(bidVol-askVol)/total*100
+ };
+}
+
+function momentumScore(candles){
+ if(candles.length<5)return 0;
+ const recent=candles.slice(-5);
+ const first=recent[0].close;
+ const last=recent[recent.length-1].close;
+ const change=first?(last-first)/first*100:0;
+ const up=recent.filter(c=>c.close>c.open).length;
+ const volumeRecent=recent.slice(-2).reduce((s,c)=>s+c.volume,0);
+ const volumePrevious=recent.slice(0,3).reduce((s,c)=>s+c.volume,0);
+ let score=50+change*15+(up-2)*5;
+ if(volumeRecent>volumePrevious)score+=5;
+ return Math.max(0,Math.min(100,score));
+}
+
+function analyze(htf,ltf,book){
+ if(htf.length<15||ltf.length<10)throw new Error("Not enough candle data");
+
+ const price=ltf[ltf.length-1].close;
+ const bsl=findLiquidity(htf,price,"BSL");
+ const ssl=findLiquidity(htf,price,"SSL");
+
+ const bslDistance=pct(bsl.level,price);
+ const sslDistance=pct(ssl.level,price);
+ const momentum=momentumScore(ltf);
+ const pressure=orderbookPressure(book);
+
+ let bslScore=50;
+ let sslScore=50;
+
+ // Liquidity pool strength
+ bslScore+=bsl.strength*.20;
+ sslScore+=ssl.strength*.20;
+
+ // Distance: nearer liquidity receives a modest attraction score
+ if(bslDistance<sslDistance)bslScore+=10;
+ else sslScore+=10;
+
+ // Five-minute momentum
+ bslScore+=(momentum-50)*.35;
+ sslScore+=(50-momentum)*.35;
+
+ // Order book pressure
+ if(pressure){
+  bslScore+=pressure.imbalance*.20;
+  sslScore-=pressure.imbalance*.20;
+ }
+
+ bslScore=Math.max(0,Math.min(100,bslScore));
+ sslScore=Math.max(0,Math.min(100,sslScore));
+
+ return {
+  price,bsl:bsl.level,ssl:ssl.level,
+  bslDistance,sslDistance,
+  bslScore,sslScore,
+  pressure,
+  momentum,
+  target:bslScore>=sslScore?"BSL":"SSL",
+  confidence:Math.abs(bslScore-sslScore)
+ };
+}
+
+async function analyzePair(pair){
+ const [htf,ltf,book]=await Promise.all([
+  getCandles(pair,"60",100),
+  getCandles(pair,"5",100),
+  getOrderbook(pair).catch(()=>null)
+ ]);
+ return {pair,...analyze(htf,ltf,book)};
+}
+
+function render(){
+ $("scanned").textContent=results.length;
+ $("bslCount").textContent=results.filter(x=>x.target==="BSL").length;
+ $("sslCount").textContent=results.filter(x=>x.target==="SSL").length;
+ $("updated").textContent=new Date().toLocaleTimeString();
+
+ $("results").innerHTML=results.map((x,i)=>`
+ <tr data-index="${i}">
+ <td>${x.pair}</td>
+ <td>${x.price}</td>
+ <td>${x.bsl}</td>
+ <td>${x.ssl}</td>
+ <td>${x.bslDistance.toFixed(3)}%</td>
+ <td>${x.sslDistance.toFixed(3)}%</td>
+ <td class="green">${x.bslScore.toFixed(1)}</td>
+ <td class="red">${x.sslScore.toFixed(1)}</td>
+ <td>${x.pressure?x.pressure.imbalance.toFixed(1)+"%":"N/A"}</td>
+ <td class="${x.target==="BSL"?"green":"red"}">${x.target}</td>
+ </tr>`).join("")||'<tr><td colspan="10">No results yet</td></tr>';
+
+ document.querySelectorAll("#results tr[data-index]").forEach(row=>{
+  row.addEventListener("click",()=>{
+   showDetails(results[Number(row.dataset.index)]);
+  });
+ });
+}
+
+function showDetails(x){
+ $("details").innerHTML=`
+ <b>${x.pair}</b><br>
+ Current price: ${x.price}<br>
+ BSL liquidity: ${x.bsl} (${x.bslDistance.toFixed(3)}% away)<br>
+ SSL liquidity: ${x.ssl} (${x.sslDistance.toFixed(3)}% away)<br>
+ BSL score: ${x.bslScore.toFixed(1)}/100<br>
+ SSL score: ${x.sslScore.toFixed(1)}/100<br>
+ 5M momentum score: ${x.momentum.toFixed(1)}/100<br>
+ Order book imbalance: ${x.pressure?x.pressure.imbalance.toFixed(2)+"%":"Unavailable"}<br>
+ <b>Next estimated liquidity target: ${x.target}</b><br>
+ <span class="small">Scores are heuristic estimates, not true probabilities or guaranteed price predictions.</span>`;
+}
+
+async function scanBatch(){
+ if(busy||!running)return;
+ busy=true;
+ try{
+  if(!instruments.length){
+   instruments=await loadInstruments();
+   log("Loaded "+instruments.length+" CoinDCX USDT futures instruments.");
+  }
+
+  // Small batches help avoid excessive API requests.
+  const batch=instruments.slice(0,12);
+  const output=await Promise.allSettled(batch.map(analyzePair));
+
+  const fresh=output
+   .filter(x=>x.status==="fulfilled")
+   .map(x=>x.value);
+
+  const failed=output.length-fresh.length;
+  results=fresh.sort((a,b)=>b.confidence-a.confidence);
+  render();
+  $("status").textContent="CONNECTED";
+  $("status").style.color="#37d996";
+  log("Scan complete: "+fresh.length+" successful, "+failed+" failed.");
+ }catch(e){
+  log("Scanner error: "+e.message);
+  $("status").textContent="API ERROR";
+  $("status").style.color="#ff7777";
+ }finally{
+  busy=false;
+ }
+}
+
+async function searchCoin(){
+ const query=$("search").value.trim().toUpperCase();
+ if(!query){log("Enter a coin name first.");return}
+ try{
+  if(!instruments.length)instruments=await loadInstruments();
+  const pair=instruments.find(p=>p.toUpperCase().includes(query));
+  if(!pair){$("details").textContent="Coin not found in active USDT futures.";return}
+  $("details").textContent="Analyzing "+pair+"...";
+  const result=await analyzePair(pair);
+  showDetails(result);
+  log("Individual analysis completed: "+pair);
+ }catch(e){
+  $("details").textContent="Analysis failed: "+e.message;
+  log("Search error: "+e.message);
+ }
+}
+
+function startScanner(){
+ if(running)return;
+ running=true;
+ $("status").textContent="CONNECTING";
+ $("status").style.color="#55aaff";
+ log("Scanner started.");
+ scanBatch();
+ timer=setInterval(scanBatch,Number($("interval").value)*1000);
+}
+
+function stopScanner(){
+ running=false;
+ if(timer)clearInterval(timer);
+ timer=null;
+ $("status").textContent="STOPPED";
+ $("status").style.color="#ff7777";
+ log("Scanner stopped.");
+}
+
+$("startBtn").addEventListener("click",startScanner);
+$("stopBtn").addEventListener("click",stopScanner);
+$("searchBtn").addEventListener("click",searchCoin);
+$("search").addEventListener("keydown",e=>{
+ if(e.key==="Enter")searchCoin();
+});
+
+window.addEventListener("beforeunload",stopScanner);
+</script>
 </body>
 </html>
