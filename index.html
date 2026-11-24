@@ -4,72 +4,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UD Next Liquidity Predictor</title>
+  <title>UD CoinDCX Next Liquidity Predictor</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>UD NEXT LIQUIDITY PREDICTOR</h1>
-      <p>Delta Exchange India · BSL vs SSL Intelligence</p>
+
+<header class="topbar">
+  <div>
+    <h1>UD NEXT LIQUIDITY PREDICTOR</h1>
+    <p>COINDCX FUTURES | BSL vs SSL INTELLIGENCE</p>
+  </div>
+  <span id="connectionStatus">DISCONNECTED</span>
+</header>
+
+<main>
+
+  <section class="controls">
+    <input id="coinSearch" type="text" placeholder="Search coin / instrument">
+    <button id="searchBtn">ANALYZE COIN</button>
+    <button id="startBtn">START SCANNER</button>
+    <button id="stopBtn">STOP SCANNER</button>
+  </section>
+
+  <section class="settings panel">
+    <h2>SCANNER SETTINGS</h2>
+    <div class="settings-grid">
+      <label>
+        Higher timeframe
+        <select id="higherTimeframe">
+          <option value="60">1 Hour</option>
+        </select>
+      </label>
+      <label>
+        Entry timeframe
+        <select id="entryTimeframe">
+          <option value="5">5 Minutes</option>
+        </select>
+      </label>
+      <label>
+        Market type
+        <select id="marketType">
+          <option value="futures">CoinDCX Futures</option>
+        </select>
+      </label>
+      <label>
+        Scan interval
+        <select id="scanInterval">
+          <option value="15">15 seconds</option>
+          <option value="30" selected>30 seconds</option>
+          <option value="60">60 seconds</option>
+        </select>
+      </label>
     </div>
-    <span id="connectionStatus">DISCONNECTED</span>
-  </header>
+  </section>
 
-  <main>
-    <section class="controls">
-      <input id="coinSearch" type="text" placeholder="Search coin, e.g. BTCUSD">
-      <button id="searchBtn">ANALYZE COIN</button>
-      <button id="startBtn">START SCANNER</button>
-      <button id="stopBtn">STOP</button>
-    </section>
+  <section class="metrics">
+    <article class="metric">
+      <p>COINS SCANNED</p>
+      <h2 id="scannedCount">0</h2>
+    </article>
+    <article class="metric">
+      <p>BSL DOMINANCE</p>
+      <h2 id="bslCount">0</h2>
+    </article>
+    <article class="metric">
+      <p>SSL DOMINANCE</p>
+      <h2 id="sslCount">0</h2>
+    </article>
+    <article class="metric">
+      <p>LAST UPDATE</p>
+      <h2 id="lastUpdate">--:--</h2>
+    </article>
+  </section>
 
-    <section class="metrics">
-      <article class="metric">
-        <p>COINS SCANNED</p>
-        <h2 id="scannedCount">0</h2>
-      </article>
-      <article class="metric">
-        <p>BSL DOMINANCE</p>
-        <h2 id="bslCount">0</h2>
-      </article>
-      <article class="metric">
-        <p>SSL DOMINANCE</p>
-        <h2 id="sslCount">0</h2>
-      </article>
-      <article class="metric">
-        <p>LAST UPDATE</p>
-        <h2 id="lastUpdate">--:--</h2>
-      </article>
-    </section>
+  <section class="panel">
+    <h2>COIN LIQUIDITY ANALYSIS</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>COIN</th>
+            <th>PRICE</th>
+            <th>BSL PRICE</th>
+            <th>SSL PRICE</th>
+            <th>BSL DISTANCE</th>
+            <th>SSL DISTANCE</th>
+            <th>BSL SCORE</th>
+            <th>SSL SCORE</th>
+            <th>NEXT TARGET</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr>
+            <td colspan="9">Click START SCANNER to begin</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-    <section class="panel">
-      <h2>LIQUIDITY ANALYSIS</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>COIN</th>
-              <th>PRICE</th>
-              <th>BSL PRICE</th>
-              <th>SSL PRICE</th>
-              <th>BSL DISTANCE</th>
-              <th>SSL DISTANCE</th>
-              <th>BSL SCORE</th>
-              <th>SSL SCORE</th>
-              <th>NEXT TARGET</th>
-            </tr>
-          </thead>
-          <tbody id="resultsBody">
-            <tr>
-              <td colspan="9">Scanner not started</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+  <section class="panel">
+    <h2>SELECTED COIN DETAILS</h2>
+    <div id="coinDetails">
+      Search a coin to view its liquidity analysis.
+    </div>
+  </section>
 
-  <script src="app.js"></script>
+  <section class="panel">
+    <h2>SCANNER LOG</h2>
+    <div id="scannerLog">System ready. Waiting for scanner start...</div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
 </body>
 </html>
